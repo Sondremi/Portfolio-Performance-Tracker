@@ -12,7 +12,7 @@ public class Konto {
     private static double kontanterTilgjengelig;
 
     public static void main(String[] args) throws IOException {
-        lesFil("src/testTrans.csv"); // Change to your own file
+        lesFil("src/transactions.csv"); // Change to your own file
         skrivTilFil();
     }
 
