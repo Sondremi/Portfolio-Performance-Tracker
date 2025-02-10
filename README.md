@@ -16,4 +16,4 @@ File must be seperated by ;
 
 * Konto.java
   
-Update int sorteringsKriterium at line 165 to represent how you would sort oversikt.txt
+Update int sorteringsKriterium to represent how you would sort oversikt.txt
