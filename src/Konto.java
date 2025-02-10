@@ -11,6 +11,13 @@ public class Konto {
     private static double kontanterInvestert;
     private static double kontanterTilgjengelig;
 
+    // Endre sorteringsKriterium etter hvordan du ønsker sorteringen:
+    // 1: Størst beholdning
+    // 2: Realisert avkastning
+    // 3: Urealisert avkastning
+    // 4: Total avkastning
+    private static int sorteringsKriterium = 4;
+
     public static void main(String[] args) throws IOException {
         lesFil("src/transactions.csv"); // Change to your own file
         skrivTilFil();
@@ -158,13 +165,6 @@ public class Konto {
     }
     
     private static void sorterVerdipapirListe() {
-        // Endre sorteringsKriterium etter hvordan du ønsker sorteringen:
-        // 1: Størst beholdning
-        // 2: Realisert avkastning
-        // 3: Urealisert avkastning
-        // 4: Total avkastning
-        int sorteringsKriterium = 4;
-
         // Opprett en ny liste med verdipapirene for sortering
         ArrayList<Verdipapir> sortertVerdipapirer = new ArrayList<>(verdipapirer);
     
