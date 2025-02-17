@@ -1,4 +1,4 @@
-# Stock-analysis
+# Portfolio Performance Tracker
 A program designed to give you an overview of your total return from all stocks you have invested in, 
 not just the ones you are invested in now. 
 
