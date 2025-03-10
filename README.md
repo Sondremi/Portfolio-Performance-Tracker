@@ -1,19 +1,19 @@
-# Portfolio Performance Tracker
-A program designed to give you an overview of your total return from all stocks you have invested in, 
-not just the ones you are invested in now. 
+# Portfolio Performance Tracker  
 
-Keep track of your return when you buy and sell mulitple times over time.
+A program designed to provide an overview of your total return across all stock investments, including past transactions, not just your current holdings.  
 
-# How to use:
-* CSV file: 
-  
-     Name must be "transactions.csv" or edit line 15 in Konto.java.
+Keep track of your returns even when buying and selling multiple times over time.  
 
-     File must be seperated by ;
+## How to Use  
 
-     "Verdipapir" must be ticker and not name of stock
+### 1. Prepare Your CSV File  
 
+- Download your transaction history from your bank as a CSV file.  
+- The file **must** be named `transactions.csv`, or you can edit line 15 in `Konto.java` to change the filename.  
+- The file **must** use `;` (semicolon) as a separator.  
+- The `"Verdipapir"` field must contain the **ticker symbol**, not the full stock name.  
 
-* Konto.java
-  
-    Update int sorteringsKriterium to represent how you would sort oversikt.txt
+### 2. Configure Sorting  
+
+- In `Konto.java`, update the `int sorteringsKriterium` variable to define how `oversikt.txt` should be sorted.  
+
