@@ -11,18 +11,10 @@ public class Konto {
     private static double kontanterInvestert;
     private static double kontanterTilgjengelig;
 
-    // Endre sorteringsKriterium etter hvordan du ønsker sorteringen:
-    // 1: Størst beholdning
-    // 2: Realisert avkastning
-    // 3: Urealisert avkastning
-    // 4: Total avkastning
-    private static int sorteringsKriterium = 4;
-
     public static void main(String[] args) throws IOException {
         lesFil("src/transactions.csv"); // Endre til å bruke args
-        //skrivTilFil();
         skrivTilCsv();
-        Runtime.getRuntime().exec("open src/oversikt.csv");
+        new ProcessBuilder("open", "src/oversikt.csv").start();
     }
 
     // Helper method to safely parse double values
@@ -105,42 +97,11 @@ public class Konto {
                     verdipapir.beregnData();
                 }
             }
-
-            sorterVerdipapirListe();
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    // Metode for å skrive ut oversikten til en tekstfil
-    /* private static void skrivTilFil() {
-        File file = new File("src/oversikt.txt");
-        try (FileWriter writer = new FileWriter(file)) {
-            skrivUtOversikt(writer);
-            System.out.println("Oversikt skrevet til filen 'oversikt.txt'.");
-        } catch (IOException e) {
-            System.out.println("Feil ved skriving til fil: " + e.getMessage());
-        }
-    }
-    private static void skrivUtOversikt(FileWriter writer) throws IOException {
-        int dashes = 177;
-        writer.write(String.format("|%s|\n", "-".repeat(dashes)));
-        writer.write(String.format("| %-175s |\n", "Kontanter investert: " + kontanterInvestert));
-        writer.write(String.format("| %-175s |\n", "Kontanter tilgjengelig: " + kontanterTilgjengelig));
-        writer.write(String.format("|%s|\n", "-".repeat(dashes)));
-
-        writer.write(String.format("| %-40s | %-8s | %-8s | %-8s | %-12s | %-12s | %-18s | %-18s | %-8s | %-16s |\n", "Ticker", "Antall", "GAV", "Kurs", "Kostpris", "Markedsverdi", "Urealisert gevinst", "Realisert gevinst", "Utbytte", "Total avkastning"));
-        writer.write(String.format("| %-1s | %-1s | %-1s | %-1s | %-1s | %-1s | %-1s | %-1s | %-1s | %-1s |\n", "----------------------------------------", "--------", "--------", "--------", "------------", "------------", "------------------", "------------------", "--------", "----------------"));
-
-        for (Verdipapir v : verdipapirer) {
-            writer.write(String.format("| %-40s | %-8s | %-8s | %-8s | %-12s | %-12s | %-18s | %-18s | %-8s | %-16s |\n", 
-            v.hentNavn(), v.hentAntall(), v.hentGav(), v.hentKurs(), v.hentKostpris(), v.hentMarkedsverdi(), v.hentUrealisertAvkastning(), v.hentRealisertAvkastning(), v.hentUtbytte(), v.hentTotalAvkastning()));
-        }
-        
-        writer.write(String.format("|%s|\n", "-".repeat(dashes)));
-    } */
-
-    // Metode for å skrive ut oversikten som et numbers ark
     private static void skrivTilCsv() {
         File file = new File("src/oversikt.csv");
         try (FileWriter writer = new FileWriter(file)) {
@@ -164,30 +125,28 @@ public class Konto {
             String aksjeKursFormel = "=HVISFEIL(AKSJE(A" + rad + ";0);\"-\")";
             String kostprisFormel = "VERDI(C" + rad + ")*VERDI(D" + rad + ")";
             String markedsverdiFormel = "VERDI(C" + rad + ")*VERDI(E" + rad + ")";
-            String urealisertGevinstFormel = markedsverdiFormel + "-" + kostprisFormel;
-            String urealisertProsentFormel = "HVISFEIL((" + urealisertGevinstFormel + ")/" + kostprisFormel + ";0)";
+            String urealisertAvkastningFormel = markedsverdiFormel + "-" + kostprisFormel;
+            String urealisertProsentFormel = "HVISFEIL((" + urealisertAvkastningFormel + ")/" + kostprisFormel + ";0)";
 
             writer.write(
-                aksjeNavnFormel + "\t" +                    // A: AKSJE-funksjon for navn
-                v.hentNavn() + "\t" +                       // B: Navn
-                antall + "\t" +                             // C: Antall
-                gav + "\t" +                                // D: GAV
-                aksjeKursFormel + "\t" +                    // E: Kurs (AKSJE)
-                "=" + kostprisFormel + "\t" +               // F: Kostpris
-                "=" + markedsverdiFormel + "\t" +           // G: Markedsverdi
-                "=" + urealisertProsentFormel + "\t" +      // H: Urealisert avkastning i %
-                "=" + urealisertGevinstFormel + "\t" +      // I: Urealisert gevinst
-                "" + "\t" +                                 // J: Realisert % gevinst
-                v.hentRealisertAvkastning() + "\t" +        // K: Realisert gevinst
-                v.hentUtbytte() + "\t" +                    // L: Utbytte
-                "" + "\t" +                                 // M: Total %
-                v.hentTotalAvkastning() + "\n"              // N: Total gevinst
+                aksjeNavnFormel + "\t" +
+                v.hentNavn() + "\t" +
+                antall + "\t" +
+                gav + "\t" +
+                aksjeKursFormel + "\t" +
+                "=" + kostprisFormel + "\t" +
+                "=" + markedsverdiFormel + "\t" +
+                "=" + urealisertProsentFormel + "\t" +
+                "=" + urealisertAvkastningFormel + "\t" +
+                v.hentRealisertAvkastningProsent() + "\t" +
+                v.hentRealisertAvkastning() + "\t" +
+                v.hentUtbytte() + "\t" +
+                v.hentTotalAvkastningProsent() + "\t" +
+                v.hentTotalAvkastning() + "\n"
             );
 
             rad++;
         }
-
-        // Summer 
     }
 
     private static boolean VerdipapirDuplicate(String navn) {
@@ -218,78 +177,5 @@ public class Konto {
             realisertAvkastning += v.hentRealisertAvkastning();
         }
         kontanterTilgjengelig = Double.parseDouble(String.format("%.2f", kontanterPaaKonto - kontanterInvestert + realisertAvkastning).replace(",", "."));
-    }
-    
-    private static void sorterVerdipapirListe() {
-        // Opprett en ny liste med verdipapirene for sortering
-        ArrayList<Verdipapir> sortertVerdipapirer = new ArrayList<>(verdipapirer);
-    
-        // Sorteringsalgoritme (Bubble Sort)
-        boolean erSortert = false;
-        while (!erSortert) {
-            erSortert = true; // Anta at listen er sortert
-    
-            for (int i = 0; i < sortertVerdipapirer.size() - 1; i++) {
-                Verdipapir verdipapir1 = sortertVerdipapirer.get(i);
-                Verdipapir verdipapir2 = sortertVerdipapirer.get(i + 1);
-    
-                // Sammenlign basert på sorteringskriterium
-                switch (sorteringsKriterium) {
-                    case 1: // Sorter på antall
-                        if (verdipapir1.hentAntall() < verdipapir2.hentAntall()) {
-                            // Bytt plass hvis beholdning er mindre
-                            sortertVerdipapirer.set(i, verdipapir2);
-                            sortertVerdipapirer.set(i + 1, verdipapir1);
-
-                            // Marker at listen ikke er fullstendig sortert
-                            erSortert = false;
-                        }
-                        break;
-                    case 2: // Sorter på realisert avkastning
-                        if (verdipapir1.hentRealisertAvkastning() < verdipapir2.hentRealisertAvkastning()) {
-                            // Bytt plass hvis beholdning er mindre
-                            sortertVerdipapirer.set(i, verdipapir2);
-                            sortertVerdipapirer.set(i + 1, verdipapir1);
-
-                            // Marker at listen ikke er fullstendig sortert
-                            erSortert = false;
-                        }
-                        break;
-                    case 3: // Sorter på urealisert avkastning
-                        if (verdipapir1.hentUrealisertAvkastning() < verdipapir2.hentUrealisertAvkastning()) {
-                            // Bytt plass hvis beholdning er mindre
-                            sortertVerdipapirer.set(i, verdipapir2);
-                            sortertVerdipapirer.set(i + 1, verdipapir1);
-
-                            // Marker at listen ikke er fullstendig sortert
-                            erSortert = false;
-                        }
-                        break;
-                    case 4: // Sorter på total avkastning
-                        if (verdipapir1.hentTotalAvkastning() < verdipapir2.hentTotalAvkastning()) {
-                            // Bytt plass hvis beholdning er mindre
-                            sortertVerdipapirer.set(i, verdipapir2);
-                            sortertVerdipapirer.set(i + 1, verdipapir1);
-
-                            // Marker at listen ikke er fullstendig sortert
-                            erSortert = false;
-                        }
-                        break;
-                    default:
-                        System.out.println("Ugyldig sorteringskriterium. Sorterer på antall.");
-                        if (verdipapir1.hentAntall() < verdipapir2.hentAntall()) {
-                            // Bytt plass hvis beholdning er mindre
-                            sortertVerdipapirer.set(i, verdipapir2);
-                            sortertVerdipapirer.set(i + 1, verdipapir1);
-
-                            // Marker at listen ikke er fullstendig sortert
-                            erSortert = false;
-                        }
-                        break;
-                }
-            }
-        }
-        // Oppdater den opprinnelige listen med den sorterte listen
-        verdipapirer = sortertVerdipapirer;
     }
 }
