@@ -139,10 +139,10 @@ public class Konto {
             String urealisertAvkastningFormel = markedsverdiFormel + "-" + kostprisFormel;
             String urealisertAvkastningProsentFormel = "AVRUND(HVISFEIL(((" + markedsverdiFormel + ")-(" + kostprisFormel + "))/(" + kostprisFormel + ")*100; 0); 2)";
 
-            String realisertAvkastningProsent = "AVRUND(HVISFEIL(K" + rad + "/F" + rad + "*100; 0); 2)";
+            String realisertAvkastningProsentFormel = "AVRUND(HVISFEIL(K" + rad + "/F" + rad + "*100; 0); 2)";
 
-            String totalAvkastning = "I" + rad + "+K" + rad + "+L" + rad;
-            String totalAvkastningProsent = "AVRUND(HVISFEIL((" + totalAvkastning + ")/F" + rad + "*100; 0); 2)";
+            String totalAvkastningFormel = "I" + rad + "+K" + rad + "+L" + rad;
+            String totalAvkastningProsentFormel = "AVRUND(HVISFEIL((" + totalAvkastningFormel + ")/F" + rad + "*100; 0); 2)";
 
             writer.write(
                 "=" + symbolFormel + "\t" +
@@ -154,11 +154,11 @@ public class Konto {
                 "=" + markedsverdiFormel + "\t" +
                 "=" + urealisertAvkastningProsentFormel + "\t" +
                 "=" + urealisertAvkastningFormel + "\t" +
-                "=" + realisertAvkastningProsent + "\t" +
+                "=" + realisertAvkastningProsentFormel + "\t" +
                 v.hentRealisertAvkastning() + "\t" +
                 v.hentUtbytte() + "\t" +
-                "=" + totalAvkastningProsent + "\t" +
-                "=" + totalAvkastning + "\n"
+                "=" + totalAvkastningProsentFormel + "\t" +
+                "=" + totalAvkastningFormel + "\n"
             );
 
             rad++;
