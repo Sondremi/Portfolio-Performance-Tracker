@@ -150,18 +150,18 @@ public class Konto {
             String tickerCell = ticker.isEmpty() ? navn : "=HVISFEIL(AKSJE(\"" + ticker + "\";25);\"-\")";
             String navnCell = ticker.isEmpty() ? navn : "=HVISFEIL(AKSJE(A" + rad + ";1);\"" + navn + "\")";
             
-            String kursFormel = "=HVISFEIL(AKSJE(A" + rad + ";0);" + v.hentGav() + ")";
+            String kursFormel = "=HVISFEIL(AKSJE(A" + rad + ";0);0)";
             
             String kostprisFormel = "VERDI(C" + rad + ")*VERDI(D" + rad + ")";
             String markedsverdiFormel = "VERDI(C" + rad + ")*VERDI(E" + rad + ")";
             
             String urealisertAvkastningFormel = "=" + markedsverdiFormel + "-" + kostprisFormel;
-            String urealisertAvkastningProsentFormel = "=AVRUND(HVISFEIL(((" + markedsverdiFormel + ")-(" + kostprisFormel + "))/(" + kostprisFormel + ")*100; 0); 2)";
+            String urealisertAvkastningProsentFormel = "=AVRUND(HVISFEIL(((" + markedsverdiFormel + ")-(" + kostprisFormel + "))/(" + kostprisFormel + "); 0); 2)";
             
-            String realisertAvkastningProsentFormel = "=AVRUND(HVISFEIL(K" + rad + "/F" + rad + "*100; 0); 2)";
+            String realisertAvkastningProsentFormel = "=AVRUND(HVISFEIL(K" + rad + "/F" + rad + "; 0); 2)";
             
             String totalAvkastningFormel = "I" + rad + "+K" + rad + "+L" + rad;
-            String totalAvkastningProsentFormel = "=AVRUND(HVISFEIL((" + totalAvkastningFormel + ")/F" + rad + "*100; 0); 2)";
+            String totalAvkastningProsentFormel = "=AVRUND(HVISFEIL((" + totalAvkastningFormel + ")/F" + rad + "; 0); 2)";
 
             writer.write(
                 tickerCell + "\t" +
