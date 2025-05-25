@@ -157,9 +157,7 @@ public class Konto {
             
             String urealisertAvkastningFormel = "=" + markedsverdiFormel + "-" + kostprisFormel;
             String urealisertAvkastningProsentFormel = "=AVRUND(HVISFEIL(((" + markedsverdiFormel + ")-(" + kostprisFormel + "))/(" + kostprisFormel + "); 0); 2)";
-            
-            String realisertAvkastningProsentFormel = "=AVRUND(HVISFEIL(K" + rad + "/F" + rad + "; 0); 2)";
-            
+                        
             String totalAvkastningFormel = "I" + rad + "+K" + rad + "+L" + rad;
             String totalAvkastningProsentFormel = "=AVRUND(HVISFEIL((" + totalAvkastningFormel + ")/F" + rad + "; 0); 2)";
 
@@ -173,7 +171,7 @@ public class Konto {
                 "=" + markedsverdiFormel + "\t" +
                 urealisertAvkastningProsentFormel + "\t" +
                 urealisertAvkastningFormel + "\t" +
-                realisertAvkastningProsentFormel + "\t" +
+                v.hentRealisertAvkastningProsent() + "\t" +
                 v.hentRealisertAvkastning() + "\t" +
                 v.hentUtbytte() + "\t" +
                 totalAvkastningProsentFormel + "\t" +

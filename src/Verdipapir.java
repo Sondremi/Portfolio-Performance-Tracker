@@ -17,6 +17,7 @@ public class Verdipapir {
     private Double antall = 0.0;
     private Double utbytte = 0.0;
     private Double realisertAvkastning = 0.0;
+    private double totalKostpris = 0.0;
 
     public Verdipapir(String n, String i) {
         navn = n;
@@ -26,10 +27,18 @@ public class Verdipapir {
 
     public String hentNavn() { return navn; }
     public String hentTicker() { return ticker; }
+
     public String hentGav() { return String.format("%.2f", gav); }
     public String hentAntall() { return String.format("%.2f", antall); }
+
     public String hentUtbytte() { return String.format("%.2f", utbytte); }
+    
     public String hentRealisertAvkastning() { return String.format("%.2f", realisertAvkastning); }
+    public String hentRealisertAvkastningProsent() {
+        if (totalKostpris == 0) return "0.00";
+        double prosent = (realisertAvkastning / totalKostpris) * 100;
+        return String.format("%.2f", prosent);
+    }
 
     private void beregnGAV() {    
         if (antall == 0) {
@@ -58,6 +67,7 @@ public class Verdipapir {
         
         if (transaksjonsType.equals("KJØP")) {
             antall += oppdatertAntall;
+            totalKostpris += totalBelop;
         } else {
             antall -= oppdatertAntall;
             realisertAvkastning += resultat;
