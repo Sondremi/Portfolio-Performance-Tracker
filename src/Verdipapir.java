@@ -49,14 +49,18 @@ public class Verdipapir {
     public void leggTilUtbytte(double belop) { utbytte += belop; }
 
     public void leggTilTransaksjon(double verdi, double oppdatertAntall, double kurs, double resultat, double totaleAvgifter) {
-        if (verdi < 0) {
-            transaksjoner.add(new ArrayList<>(Arrays.asList("KJØP", ((oppdatertAntall * kurs) + totaleAvgifter))));
+        String transaksjonsType = (verdi < 0) ? "KJØP" : "SALG";
+        double totalBelop = oppdatertAntall * kurs + totaleAvgifter;
+        
+        transaksjoner.add(new ArrayList<>(Arrays.asList(transaksjonsType, totalBelop)));
+        
+        if (transaksjonsType.equals("KJØP")) {
             antall += oppdatertAntall;
         } else {
-            transaksjoner.add(new ArrayList<>(Arrays.asList("SALG", ((oppdatertAntall * kurs) + totaleAvgifter))));
             antall -= oppdatertAntall;
             realisertAvkastning += resultat;
         }
+        
         beregnGAV();
     }
 }

@@ -21,6 +21,13 @@ public class Konto {
         return Double.parseDouble(value.replaceAll(" ", ""));
     }
 
+    private static String[] rengjorLinje(String linje) {
+        return linje.replaceAll(" ", "")
+                    .replaceAll("−", "-")
+                    .replaceAll(",", ".")
+                    .split(";");
+    }
+
     private static boolean VerdipapirDuplicate(String navn) {
         for (Verdipapir v : verdipapirer) {
             if (v.hentNavn().equals(navn)) {
@@ -39,71 +46,82 @@ public class Konto {
         return null;
     }
 
+    private static void opprettNyttVerdipapirHvisNodvendig(String verdipapirNavn) {
+        if (!VerdipapirDuplicate(verdipapirNavn) && !verdipapirNavn.isEmpty()) {
+            verdipapirer.add(new Verdipapir(verdipapirNavn));
+        }
+    }
+
+    private static class HeaderIndekser {
+        int verdipapir, transaksjonstype, belop, antall, kurs, resultat, totaleAvgifter;
+        
+        HeaderIndekser() {
+            verdipapir = transaksjonstype = belop = antall = kurs = resultat = totaleAvgifter = -1;
+        }
+    }
+
+    private static HeaderIndekser finnHeaderIndekser(String header) {
+        String[] headerDelt = header.split(";");
+        HeaderIndekser indekser = new HeaderIndekser();
+        
+        for (int i = 0; i < headerDelt.length; i++) {
+            switch (headerDelt[i]) {
+                case "Verdipapir" -> indekser.verdipapir = i;
+                case "Transaksjonstype" -> indekser.transaksjonstype = i;
+                case "Beløp" -> indekser.belop = i;
+                case "Antall" -> indekser.antall = i;
+                case "Kurs" -> indekser.kurs = i;
+                case "Resultat" -> indekser.resultat = i;
+                case "Totale Avgifter" -> indekser.totaleAvgifter = i;
+            }
+        }
+        return indekser;
+    }
+
+    private static void behandleLinje(String linje, HeaderIndekser indekser) {
+        String[] linjeDelt = rengjorLinje(linje);
+        
+        String verdipapirNavn = linjeDelt[indekser.verdipapir];
+        if (verdipapirNavn.isEmpty()) {
+            return;
+        }
+        
+        opprettNyttVerdipapirHvisNodvendig(verdipapirNavn);
+        
+        Verdipapir verdipapir = hentVerdipapir(verdipapirNavn);
+        if (verdipapir == null) {
+            return;
+        }
+        
+        behandleTransaksjon(verdipapir, linjeDelt, indekser);
+    }
+
+    private static void behandleTransaksjon(Verdipapir verdipapir, String[] linjeDelt, HeaderIndekser indekser) {
+        String transaksjonstype = linjeDelt[indekser.transaksjonstype];
+        double belop = parseDoubleOrZero(linjeDelt[indekser.belop]);
+        double antall = parseDoubleOrZero(linjeDelt[indekser.antall]);
+        double kurs = parseDoubleOrZero(linjeDelt[indekser.kurs]);
+        double resultat = parseDoubleOrZero(linjeDelt[indekser.resultat]);
+        double totaleAvgifter = parseDoubleOrZero(linjeDelt[indekser.totaleAvgifter]);
+        
+        switch (transaksjonstype) {
+            case "SALG", "KJØPT", "REINVESTERTUTBYTTE" -> verdipapir.leggTilTransaksjon(belop, antall, kurs, resultat, totaleAvgifter);
+            case "UTBYTTE" -> verdipapir.leggTilUtbytte(belop);
+            case "INNSKUDD", "UTTAK INTERNET", "PLATTFORMAVGIFT",
+                "TILBAKEBET. FOND AVG", "OVERBELÅNINGSRENTE", "TILBAKEBETALING" -> {
+                // For å håndtere kontanter
+            }
+            //default -> System.out.println("Ikke behandlet transaksjonstype: " + transaksjonstype);
+        }
+    }
+
     private static void lesFil(String filnavn) throws IOException {
         try (Scanner leser = new Scanner(new File(filnavn))) {
             String header = leser.nextLine();
-            String[] headerDelt = header.split(";");
-
-            int verdipapirIndex = -1; int transaksjonstypeIndex = -1; int belopIndex = -1; int antallIndex = -1; int kursIndex = -1; int resultatIndex = -1; int totaleAvgifterIndex = -1;
-
-            // Går gjennom header og henter index til de oppgitte typene
-            for (int i = 0; i < headerDelt.length; i++) {
-                if (headerDelt[i].contains("Verdipapir")) {
-                    verdipapirIndex = i;
-                } else if (headerDelt[i].contains("Transaksjonstype")) {
-                    transaksjonstypeIndex = i;
-                } else if (headerDelt[i].contains("Beløp")) {
-                    belopIndex = i;
-                } else if (headerDelt[i].contains("Antall")) {
-                    antallIndex = i;
-                } else if (headerDelt[i].contains("Kurs")) {
-                    kursIndex = i;
-                } else if (headerDelt[i].contains("Resultat")) {
-                    resultatIndex = i;
-                } else if (headerDelt[i].contains("Totale Avgifter")) {
-                    totaleAvgifterIndex = i;
-                }
-            }
-
+            HeaderIndekser indekser = finnHeaderIndekser(header);
+            
             while (leser.hasNextLine()) {
-                String[] linjeDelt = leser.nextLine().replaceAll(" ", "").replaceAll("−", "-").replaceAll(",", ".").split(";");
-
-                String verdipapirNavn = linjeDelt[verdipapirIndex];
-                if (!VerdipapirDuplicate(verdipapirNavn) && !verdipapirNavn.equals("")) {
-                    verdipapirer.add(new Verdipapir(verdipapirNavn));
-                }
-
-                if (verdipapirNavn.isEmpty()) {
-                    continue;
-                }
-
-                Verdipapir verdipapir = hentVerdipapir(verdipapirNavn);
-                if (verdipapir == null) {
-                    continue;
-                }
-
-                String transaksjonstype = linjeDelt[transaksjonstypeIndex];
-                double belop = parseDoubleOrZero(linjeDelt[belopIndex]);
-                double antall = parseDoubleOrZero(linjeDelt[antallIndex]);
-                double kurs = parseDoubleOrZero(linjeDelt[kursIndex]);
-                double resultat = parseDoubleOrZero(linjeDelt[resultatIndex]);
-                double totaleAvgifter = parseDoubleOrZero(linjeDelt[totaleAvgifterIndex]);
-
-                if (transaksjonstype.equals("SALG") || transaksjonstype.equals("KJØPT") || transaksjonstype.equals("REINVESTERT UTBYTTE")) {
-                    verdipapir.leggTilTransaksjon(belop, antall, kurs, resultat, totaleAvgifter);
-                    if (transaksjonstype.equals("REINVESTERT UTBYTTE")) {
-                        verdipapir.leggTilUtbytte(belop); // Setter utbyttet som kostpris, istedet for utbetalt utbytte på konto
-                    }
-                } else if (transaksjonstype.equals("UTBYTTE")) {
-                    verdipapir.leggTilUtbytte(belop);
-                } else if (transaksjonstype.equals("INNSKUDD") || transaksjonstype.equals("UTTAK INTERNET") || transaksjonstype.equals("PLATTFORMAVGIFT")
-                    || transaksjonstype.equals("TILBAKEBET. FOND AVG") || transaksjonstype.equals("OVERBELÅNINGSRENTE") || transaksjonstype.equals("TILBAKEBETALING")) {
-                } 
-
-                // Testing: Sjekker transaksjonstyper som ikke er implementert
-                else {
-                    System.out.println("Ikke behandlet transaksjonstype: " + transaksjonstype);
-                } 
+                behandleLinje(leser.nextLine(), indekser);
             }
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
