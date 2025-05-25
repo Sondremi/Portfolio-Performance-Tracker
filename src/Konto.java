@@ -11,7 +11,6 @@ public class Konto {
     public static void main(String[] args) throws IOException {
         lesFil("transactions.csv");
         skrivTilCsv();
-        new ProcessBuilder("open", "oversikt.csv").start();
     }
 
     private static double parseDoubleOrZero(String value) {
@@ -46,17 +45,17 @@ public class Konto {
         return null;
     }
 
-    private static void opprettNyttVerdipapirHvisNodvendig(String verdipapirNavn) {
+    private static void opprettNyttVerdipapirHvisNodvendig(String verdipapirNavn, String isin) {
         if (!VerdipapirDuplicate(verdipapirNavn) && !verdipapirNavn.isEmpty()) {
-            verdipapirer.add(new Verdipapir(verdipapirNavn));
+            verdipapirer.add(new Verdipapir(verdipapirNavn, isin));
         }
     }
 
     private static class HeaderIndekser {
-        int verdipapir, transaksjonstype, belop, antall, kurs, resultat, totaleAvgifter;
+        int verdipapir, isin, transaksjonstype, belop, antall, kurs, resultat, totaleAvgifter;
         
         HeaderIndekser() {
-            verdipapir = transaksjonstype = belop = antall = kurs = resultat = totaleAvgifter = -1;
+            verdipapir = isin = transaksjonstype = belop = antall = kurs = resultat = totaleAvgifter = -1;
         }
     }
 
@@ -67,6 +66,7 @@ public class Konto {
         for (int i = 0; i < headerDelt.length; i++) {
             switch (headerDelt[i]) {
                 case "Verdipapir" -> indekser.verdipapir = i;
+                case "ISIN" -> indekser.isin = i;
                 case "Transaksjonstype" -> indekser.transaksjonstype = i;
                 case "Beløp" -> indekser.belop = i;
                 case "Antall" -> indekser.antall = i;
@@ -86,7 +86,7 @@ public class Konto {
             return;
         }
         
-        opprettNyttVerdipapirHvisNodvendig(verdipapirNavn);
+        opprettNyttVerdipapirHvisNodvendig(verdipapirNavn, linjeDelt[indekser.isin]);
         
         Verdipapir verdipapir = hentVerdipapir(verdipapirNavn);
         if (verdipapir == null) {
@@ -132,7 +132,7 @@ public class Konto {
         File file = new File("oversikt.csv");
         try (FileWriter writer = new FileWriter(file)) {
             skrivUtOversiktSomCsv(writer);
-            System.out.println("Oversikt skrevet til filen 'oversikt.csv'.");
+            new ProcessBuilder("open", "oversikt.csv").start();
         } catch (IOException e) {
             System.out.println("Feil ved skriving til fil: " + e.getMessage());
         }
@@ -145,35 +145,38 @@ public class Konto {
 
         for (Verdipapir v : verdipapirer) {
             String ticker = v.hentTicker();
-
-            String symbolFormel = "HVISFEIL(AKSJE(\"" + ticker + "\";25);\"-\")";
-            String kursFormel = "HVISFEIL(AKSJE(A" + rad + ";0);\"-\")";
-
+            String navn = v.hentNavn();
+            
+            String tickerCell = ticker.isEmpty() ? navn : "=HVISFEIL(AKSJE(\"" + ticker + "\";25);\"-\")";
+            String navnCell = ticker.isEmpty() ? navn : "=HVISFEIL(AKSJE(A" + rad + ";1);\"" + navn + "\")";
+            
+            String kursFormel = "=HVISFEIL(AKSJE(A" + rad + ";0);" + v.hentGav() + ")";
+            
             String kostprisFormel = "VERDI(C" + rad + ")*VERDI(D" + rad + ")";
             String markedsverdiFormel = "VERDI(C" + rad + ")*VERDI(E" + rad + ")";
-
-            String urealisertAvkastningFormel = markedsverdiFormel + "-" + kostprisFormel;
-            String urealisertAvkastningProsentFormel = "AVRUND(HVISFEIL(((" + markedsverdiFormel + ")-(" + kostprisFormel + "))/(" + kostprisFormel + ")*100; 0); 2)";
-
-            String realisertAvkastningProsentFormel = "AVRUND(HVISFEIL(K" + rad + "/F" + rad + "*100; 0); 2)";
-
+            
+            String urealisertAvkastningFormel = "=" + markedsverdiFormel + "-" + kostprisFormel;
+            String urealisertAvkastningProsentFormel = "=AVRUND(HVISFEIL(((" + markedsverdiFormel + ")-(" + kostprisFormel + "))/(" + kostprisFormel + ")*100; 0); 2)";
+            
+            String realisertAvkastningProsentFormel = "=AVRUND(HVISFEIL(K" + rad + "/F" + rad + "*100; 0); 2)";
+            
             String totalAvkastningFormel = "I" + rad + "+K" + rad + "+L" + rad;
-            String totalAvkastningProsentFormel = "AVRUND(HVISFEIL((" + totalAvkastningFormel + ")/F" + rad + "*100; 0); 2)";
+            String totalAvkastningProsentFormel = "=AVRUND(HVISFEIL((" + totalAvkastningFormel + ")/F" + rad + "*100; 0); 2)";
 
             writer.write(
-                "=" + symbolFormel + "\t" +
-                v.hentNavn() + "\t" +
+                tickerCell + "\t" +
+                navnCell + "\t" +
                 v.hentAntall() + "\t" +
                 v.hentGav() + "\t" +
-                "=" + kursFormel + "\t" +
+                kursFormel + "\t" +
                 "=" + kostprisFormel + "\t" +
                 "=" + markedsverdiFormel + "\t" +
-                "=" + urealisertAvkastningProsentFormel + "\t" +
-                "=" + urealisertAvkastningFormel + "\t" +
-                "=" + realisertAvkastningProsentFormel + "\t" +
+                urealisertAvkastningProsentFormel + "\t" +
+                urealisertAvkastningFormel + "\t" +
+                realisertAvkastningProsentFormel + "\t" +
                 v.hentRealisertAvkastning() + "\t" +
                 v.hentUtbytte() + "\t" +
-                "=" + totalAvkastningProsentFormel + "\t" +
+                totalAvkastningProsentFormel + "\t" +
                 "=" + totalAvkastningFormel + "\n"
             );
 
