@@ -104,8 +104,6 @@ public class Konto {
                 else {
                     System.out.println("Ikke behandlet transaksjonstype: " + transaksjonstype);
                 } 
-            
-                verdipapir.beregnGAV();
             }
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());

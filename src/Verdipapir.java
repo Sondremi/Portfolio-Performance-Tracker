@@ -17,13 +17,32 @@ public class Verdipapir {
 
     // Konverter navn til ticker
     private void settTicker() {
+        // Navn kan være "Aker BP", "DNB ASA", KOAo, etc for aksjer.
+        // For fond kan det være "DNB Global Indeks A", "Heimdal Høyrente N", Nordnet Global Indeks 125 NOK, etc.
         ticker = "HAUTO.OL"; // Dummy
+    }
+
+    private void beregnGAV() {    
+        if (antall == 0) {
+            gav = 0.0;
+            return;
+        }
+
+        double total = transaksjoner.stream()
+            .mapToDouble(trans -> {
+                boolean erKjop = "KJØP".equals(trans.get(0));
+                double belop = (double) trans.get(1);
+                return erKjop ? belop : -belop;
+            })
+            .sum();
+        
+        gav = total / antall;
     }
 
     public String hentNavn() { return navn; }
     public String hentTicker() { return ticker; }
-    public String hentAntall() { return String.format("%.2f", antall); }
     public String hentGav() { return String.format("%.2f", gav); }
+    public String hentAntall() { return String.format("%.2f", antall); }
     public String hentUtbytte() { return String.format("%.2f", utbytte); }
     public String hentRealisertAvkastning() { return String.format("%.2f", realisertAvkastning); }
 
@@ -38,25 +57,6 @@ public class Verdipapir {
             antall -= oppdatertAntall;
             realisertAvkastning += resultat;
         }
-    }
-
-    public void beregnGAV() {    
-        double total = 0.0;
-
-        for (ArrayList<Object> trans : transaksjoner) {
-            double belop = (double) trans.get(1);
-
-            if (trans.get(0).equals("KJØP")) {
-                total += belop;
-            } else {
-                total -= belop;
-            } 
-        }
-    
-        if (antall > 0) {
-            gav =  total / antall;
-        } else {
-            gav = 0.0;
-        }
+        beregnGAV();
     }
 }
