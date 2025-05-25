@@ -129,10 +129,10 @@ public class Konto {
     }
 
     private static void skrivTilCsv() {
-        File file = new File("oversikt.csv");
+        File file = new File("portfolio.csv");
         try (FileWriter writer = new FileWriter(file)) {
             skrivUtOversiktSomCsv(writer);
-            new ProcessBuilder("open", "oversikt.csv").start();
+            new ProcessBuilder("open", "portfolio.csv").start();
         } catch (IOException e) {
             System.out.println("Feil ved skriving til fil: " + e.getMessage());
         }
