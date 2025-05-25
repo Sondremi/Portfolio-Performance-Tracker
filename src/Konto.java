@@ -9,7 +9,7 @@ public class Konto {
     private static ArrayList<Verdipapir> verdipapirer = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
-        lesFil("src/transactions.csv"); // Endre til å bruke args
+        lesFil("transactions.csv"); // Endre til å bruke args
         skrivTilCsv();
         new ProcessBuilder("open", "oversikt.csv").start();
     }
@@ -101,7 +101,7 @@ public class Konto {
                 } else if (transaksjonstype.equals("INNSKUDD") || transaksjonstype.equals("UTTAK INTERNET") || transaksjonstype.equals("PLATTFORMAVGIFT")
                     || transaksjonstype.equals("TILBAKEBET. FOND AVG") || transaksjonstype.equals("OVERBELÅNINGSRENTE") || transaksjonstype.equals("TILBAKEBETALING")) {
                 } 
-                
+
                 // Testing: Sjekker transaksjonstyper som ikke er implementert
                 else {
                     System.out.println("Ikke behandlet transaksjonstype: " + transaksjonstype);
