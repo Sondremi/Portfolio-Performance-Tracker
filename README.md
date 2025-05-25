@@ -1,19 +1,16 @@
-# Portfolio Performance Tracker  
+# Portfolio Performance Tracker
 
-A program designed to provide an overview of your total return across all stock investments, including past transactions, not just your current holdings.  
+A Java program that analyzes your investment transactions and calculates comprehensive performance metrics across all your stocks and funds.
 
-Keep track of your returns even when buying and selling multiple times over time.  
+## Key Features
+- Calculates both realized and unrealized returns
+- Tracks performance across multiple transactions
+- Handles dividends, buys, and sells
+- Generates a Numbers-ready CSV with automatic stock price lookups
 
-## How to Use  
+## How to Use
+1. Export your transaction history from your broker as CSV
+2. Save the file as `transactions.csv` in the same folder as the program
 
-### 1. Prepare Your CSV File  
-
-- Download your transaction history from your bank as a CSV file.  
-- The file **must** be named `transactions.csv`, or you can edit line 15 in `Konto.java` to change the filename.  
-- The file **must** use `;` (semicolon) as a separator.  
-- The `"Verdipapir"` field must contain the **ticker symbol**, not the full stock name.  
-
-### 2. Configure Sorting  
-
-- In `Konto.java`, update the `int sorteringsKriterium` variable to define how `oversikt.txt` should be sorted.  
-
+## Example on result
+![](portfolio_example.png)
