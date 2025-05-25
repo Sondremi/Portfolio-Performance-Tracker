@@ -9,12 +9,11 @@ public class Konto {
     private static ArrayList<Verdipapir> verdipapirer = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
-        lesFil("transactions.csv"); // Endre til å bruke args
+        lesFil("transactions.csv");
         skrivTilCsv();
         new ProcessBuilder("open", "oversikt.csv").start();
     }
 
-    // Helper method to safely parse double values
     private static double parseDoubleOrZero(String value) {
         if (value == null || value.trim().isEmpty()) {
             return 0.0;
@@ -22,7 +21,6 @@ public class Konto {
         return Double.parseDouble(value.replaceAll(" ", ""));
     }
 
-    // Hjelpemetode for å sjekke om et verdipapir allerede finnes i listen
     private static boolean VerdipapirDuplicate(String navn) {
         for (Verdipapir v : verdipapirer) {
             if (v.hentNavn().equals(navn)) {
