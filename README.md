@@ -12,5 +12,5 @@ A Java program that analyzes your investment transactions and calculates compreh
 1. Export your transaction history from your broker as CSV
 2. Save the file as `transactions.csv` in the same folder as the program
 
-## Example on result
+## Example on portfolio
 ![](portfolio_example.png)
