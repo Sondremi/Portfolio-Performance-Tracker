@@ -15,6 +15,7 @@ public class Verdipapir {
         settTicker();
     }
 
+    // Konverter navn til ticker
     private void settTicker() {
         ticker = "HAUTO.OL"; // Dummy
     }
