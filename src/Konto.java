@@ -147,16 +147,16 @@ public class Konto {
             writer.write(
                 "=" + symbolFormel + "\t" +
                 v.hentNavn() + "\t" +
-                String.valueOf(v.hentAntall()).replace(".", ",") + "\t" +
-                String.valueOf(v.hentGav()).replace(".", ",") + "\t" +
+                v.hentAntall() + "\t" +
+                v.hentGav() + "\t" +
                 "=" + kursFormel + "\t" +
                 "=" + kostprisFormel + "\t" +
                 "=" + markedsverdiFormel + "\t" +
                 "=" + urealisertAvkastningProsentFormel + "\t" +
                 "=" + urealisertAvkastningFormel + "\t" +
                 "=" + realisertAvkastningProsent + "\t" +
-                String.valueOf(v.hentRealisertAvkastning()).replace(".", ",") + "\t" +
-                String.valueOf(v.hentUtbytte()).replace(".", ",") + "\t" +
+                v.hentRealisertAvkastning() + "\t" +
+                v.hentUtbytte() + "\t" +
                 "=" + totalAvkastningProsent + "\t" +
                 "=" + totalAvkastning + "\n"
             );

@@ -16,28 +16,25 @@ public class Verdipapir {
     }
 
     private void settTicker() {
-        ticker = "HAUTO.OL";
+        ticker = "HAUTO.OL"; // Dummy
     }
 
     public String hentNavn() { return navn; }
     public String hentTicker() { return ticker; }
-
-    public double hentAntall() { return Double.parseDouble(String.format("%.2f", antall).replace(",", ".")); }
-    public double hentGav() { return Double.parseDouble(String.format("%.2f", gav).replace(",", ".")); }
-    public double hentUtbytte() { return Double.parseDouble(String.format("%.2f", utbytte).replace(",", ".")); }
-    public double hentRealisertAvkastning() { return Double.parseDouble(String.format("%.2f", realisertAvkastning).replace(",", ".")); }
-
-    private void oppdaterAntall(double a) { antall = Math.max(antall + a, 0); }
+    public String hentAntall() { return String.format("%.2f", antall); }
+    public String hentGav() { return String.format("%.2f", gav); }
+    public String hentUtbytte() { return String.format("%.2f", utbytte); }
+    public String hentRealisertAvkastning() { return String.format("%.2f", realisertAvkastning); }
 
     public void leggTilUtbytte(double belop) { utbytte += belop; }
 
-    public void leggTilTransaksjon(double verdi, double antall, double kurs, double resultat, double totaleAvgifter) {
+    public void leggTilTransaksjon(double verdi, double oppdatertAntall, double kurs, double resultat, double totaleAvgifter) {
         if (verdi < 0) {
-            transaksjoner.add(new ArrayList<>(Arrays.asList("KJØPT", ((antall * kurs) + totaleAvgifter))));
-            oppdaterAntall(antall);
+            transaksjoner.add(new ArrayList<>(Arrays.asList("KJØP", ((oppdatertAntall * kurs) + totaleAvgifter))));
+            antall += oppdatertAntall;
         } else {
-            transaksjoner.add(new ArrayList<>(Arrays.asList("SALG", ((antall * kurs) + totaleAvgifter))));
-            oppdaterAntall(-antall);
+            transaksjoner.add(new ArrayList<>(Arrays.asList("SALG", ((oppdatertAntall * kurs) + totaleAvgifter))));
+            antall -= oppdatertAntall;
             realisertAvkastning += resultat;
         }
     }
@@ -48,7 +45,7 @@ public class Verdipapir {
         for (ArrayList<Object> trans : transaksjoner) {
             double belop = (double) trans.get(1);
 
-            if (trans.get(0).equals("KJØPT")) {
+            if (trans.get(0).equals("KJØP")) {
                 total += belop;
             } else {
                 total -= belop;
