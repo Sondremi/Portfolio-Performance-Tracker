@@ -8,10 +8,6 @@ import java.util.ArrayList;
 public class Konto {
     private static ArrayList<Verdipapir> verdipapirer = new ArrayList<>();
 
-    private static double kontanterPaaKonto;
-    private static double kontanterInvestert;
-    private static double kontanterTilgjengelig;
-
     public static void main(String[] args) throws IOException {
         lesFil("src/transactions.csv"); // Endre til å bruke args
         skrivTilCsv();
@@ -43,18 +39,6 @@ public class Konto {
             }
         }
         return null;
-    }
-
-    private static void leggTilKontanter(double belop) {kontanterPaaKonto += belop; oppdaterKontanter();}
-
-    private static void oppdaterKontanter() {  
-        kontanterInvestert = 0.0;
-        double realisertAvkastning = 0.0;     
-        for (Verdipapir v : verdipapirer) {     
-            kontanterInvestert += v.hentKostpris();
-            realisertAvkastning += v.hentRealisertAvkastning();
-        }
-        kontanterTilgjengelig = Double.parseDouble(String.format("%.2f", kontanterPaaKonto - kontanterInvestert + realisertAvkastning).replace(",", "."));
     }
 
     private static void lesFil(String filnavn) throws IOException {
@@ -114,18 +98,16 @@ public class Konto {
                     }
                 } else if (transaksjonstype.equals("UTBYTTE")) {
                     verdipapir.leggTilUtbytte(belop);
-                    leggTilKontanter(belop);
                 } else if (transaksjonstype.equals("INNSKUDD") || transaksjonstype.equals("UTTAK INTERNET") || transaksjonstype.equals("PLATTFORMAVGIFT")
-                        || transaksjonstype.equals("TILBAKEBET. FOND AVG") || transaksjonstype.equals("OVERBELÅNINGSRENTE") || transaksjonstype.equals("TILBAKEBETALING")) {
-                    leggTilKontanter(belop);
+                    || transaksjonstype.equals("TILBAKEBET. FOND AVG") || transaksjonstype.equals("OVERBELÅNINGSRENTE") || transaksjonstype.equals("TILBAKEBETALING")) {
                 } 
+                
                 // Testing: Sjekker transaksjonstyper som ikke er implementert
                 else {
                     System.out.println("Ikke behandlet transaksjonstype: " + transaksjonstype);
                 } 
-
-                // Oppdaterer verdipapirets data fortløpende
-                verdipapir.beregnData();
+            
+                verdipapir.beregnGAV();
             }
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -183,7 +165,7 @@ public class Konto {
 
             rad++;
         }
-        
+
         writer.write("\t\t\t\t\t" +
             "=SUMMER(F" + startRad + ":F" + (rad-1) + ")\t" +
             "=SUMMER(G" + startRad + ":G" + (rad-1) + ")\t" +
@@ -193,7 +175,7 @@ public class Konto {
             "=SUMMER(K" + startRad + ":K" + (rad-1) + ")\t" +
             "=SUMMER(L" + startRad + ":L" + (rad-1) + ")\t" +
             "=SUMMER(M" + startRad + ":M" + (rad-1) + ")\t" +
-            "=SUMMER(N" + startRad + ":N" + (rad-1) + ")\t"
+            "=SUMMER(N" + startRad + ":N" + (rad-1) + ")\n"
         );
     }
 }
